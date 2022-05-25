@@ -2,7 +2,7 @@
     "name": "@0xweb/hardhat",
     "description": "Hardhat addon for 0xweb",
     "version": "0.1.0",
-    "main": "./index.js",
+    "main": "./lib/index.js",
     "author": {
         "name": "Alex Kit",
         "email": "alex.kit@atmajs.com"
@@ -18,16 +18,99 @@
     ],
     "license": "MIT",
     "dependencies": {
+        "0xweb": "^0.9.19",
+        "alot": "^0.3.0",
         "memd": "^0.3.10"
     },
     "peerDependencies": {
         "@nomiclabs/hardhat-etherscan": ">=3.0.3",
         "@nomiclabs/hardhat-waffle": ">=2.0.3",
         "@nomiclabs/hardhat-web3": ">=2.0.0",
-        "ethers": ">=5.6.4",
         "hardhat": ">=2.9.3"
     },
     "scripts": {
-
+        "build": "app-bundler",
+        "watch": "app-bundler --watch",
+        "test": "atma --openssl-legacy-provider test"
+    },
+    "devDependencies": {
+        "app-bundler": "^0.1.7",
+        "shellbee": "^0.5.22"
+    },
+    "app-bundler": {
+        "file": "src/index.ts",
+        "outputMain": "lib/index.js",
+        "package": {
+            "module": "commonjs",
+            "commonjs": {
+                "output": "simplified"
+            }
+        },
+        "extensions": {
+            "io": {
+                "type": "js"
+            }
+        },
+        "defaultExtensions": {
+            "js": "ts"
+        },
+        "dynamicDependencies": [
+            "alot",
+            "atma-io",
+            "0xweb",
+            "^hardhat"
+        ],
+        "middlewares": {
+            "ts": [
+                "atma-loader-ts:read"
+            ]
+        },
+        "settings": {
+            "atma-loader-ts": {
+                "typescript": {
+                    "compilerOptions": {
+                        "module": "CommonJS",
+                        "lib": [
+                            "ES2019"
+                        ],
+                        "target": "ES2019"
+                    }
+                }
+            }
+        }
+    },
+    "atma": {
+        "plugins": [
+            "atma-loader-ts"
+        ],
+        "settings": {
+            "atma-utest": {
+                "include": {
+                    "amd": true,
+                    "extentionDefault": {
+                        "js": "ts"
+                    }
+                }
+            },
+            "include": {
+                "amd": true,
+                "extentionDefault": {
+                    "js": "ts"
+                }
+            },
+            "atma-loader-ts": {
+                "typescript": {
+                    "compilerOptions": {
+                        "#if (TEST)": {
+                            "module": "AMD"
+                        },
+                        "#if (!TEST)": {
+                            "module": "commonjs"
+                        },
+                        "sourceMap": false
+                    }
+                }
+            }
+        }
     }
 }
