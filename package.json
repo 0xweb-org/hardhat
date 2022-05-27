@@ -31,10 +31,12 @@
     "scripts": {
         "build": "app-bundler",
         "watch": "app-bundler --watch",
-        "test": "atma --openssl-legacy-provider test"
+        "test": "atma --openssl-legacy-provider test",
+        "release": "echo \"Run atma pub -m \"message\"\""
     },
     "devDependencies": {
         "app-bundler": "^0.1.7",
+        "atma": "^0.15.17",
         "shellbee": "^0.5.22"
     },
     "app-bundler": {
