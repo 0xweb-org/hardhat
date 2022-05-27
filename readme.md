@@ -1,4 +1,4 @@
-# [Hardhat](https://hardhat.org/) plugin for [`0xWeb`](https://0xweb.org)
+# [`0xWeb`](https://0xweb.org) plugin for [Hardhat](https://hardhat.org/)
 
 
 ----
