@@ -1,6 +1,6 @@
 {
     "name": "@0xweb/hardhat",
-    "description": "Hardhat addon for 0xweb",
+    "description": "Hardhat plugin for 0xweb",
     "version": "0.1.0",
     "main": "./lib/index.js",
     "author": {
@@ -18,7 +18,7 @@
     ],
     "license": "MIT",
     "dependencies": {
-        "0xweb": "^0.9.19",
+        "0xweb": "^0.9.24",
         "alot": "^0.3.0",
         "memd": "^0.3.10"
     },

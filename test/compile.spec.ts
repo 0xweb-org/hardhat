@@ -19,7 +19,7 @@ UTest({
             command: 'node --openssl-legacy-provider compile.js',
             cwd: PROJ
         });
-        let content = await File.readAsync(`${PROJ}/0xweb/hardhat/Foo/Foo.ts`, { skipHooks: true });
+        let content = await File.readAsync(`${PROJ_0xWEB}/hardhat/Foo/Foo.ts`, { skipHooks: true });
         has_(content, 'class Foo extends ContractBase');
     }
 })
