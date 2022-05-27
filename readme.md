@@ -2,7 +2,7 @@
 
 
 ----
-[![NPM version](https://badge.fury.io/js/0xweb/hardhat.svg)](http://badge.fury.io/js/0xweb/hardhat)
+[![npm version](https://badge.fury.io/js/@0xweb%2Fhardhat.svg)](https://badge.fury.io/js/@0xweb%2Fhardhat)
 [![CircleCI](https://circleci.com/gh/0xweb-org/hardhat.svg?style=svg)](https://circleci.com/gh/0xweb-org/hardhat)
 
 
@@ -11,7 +11,7 @@ The plugin generates `0xWeb` classes for compiled solidity contracts, making the
 > We use [📦 dequanto library](https://github.com/0xweb-org/dequanto) for the classes
 
 ---
-[Documentation 📜](https://docs.0xweb.org/hardhat)
+[Documentation 📜](https://docs.0xweb.org/hardhat/info)
 ---
 
 # Install
