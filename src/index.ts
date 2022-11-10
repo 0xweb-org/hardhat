@@ -1,4 +1,5 @@
 import alot from 'alot'
+import * as path from 'path';
 import { TASK_CLEAN, TASK_COMPILE, TASK_COMPILE_SOLIDITY_COMPILE_JOBS } from 'hardhat/builtin-tasks/task-names'
 import { extendConfig, subtask, task } from 'hardhat/config'
 import { resolveConfig } from './config'
@@ -15,15 +16,28 @@ extendConfig((config) => {
 task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
     .addOptionalParam('sources', 'Override the sources directory')
     .addOptionalParam('artifacts', 'Override the artifacts output directory')
+    .addOptionalParam('watch', 'Re-runs compilation task on changes')
     .setAction(async (compilationArgs, { run, config }, runSuper) => {
 
         if (compilationArgs.sources) {
-            config.paths.sources = process.cwd() + compilationArgs.sources;
+            config.paths.sources = path.join(process.cwd(), compilationArgs.sources);
         }
         if (compilationArgs.artifacts) {
-            config.paths.artifacts = process.cwd() + compilationArgs.artifacts;
+            config.paths.artifacts = path.join(process.cwd(), compilationArgs.artifacts);
         }
-        await runSuper()
+        if (compilationArgs.watch != null) {
+
+            const directory = `file://${config.paths.sources}/`;
+            Directory.watch(directory, async (...args) => {
+                console.log('XX', args);
+                await runSuper();
+            });
+            await runSuper();
+            await new Promise(resolve => {});
+            return;
+        }
+
+        await runSuper();
     });
 
 subtask(TASK_COMPILE_SOLIDITY_COMPILE_JOBS, 'Compiles the entire project, building all artifacts')

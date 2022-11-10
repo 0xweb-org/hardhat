@@ -1,7 +1,7 @@
 {
     "name": "@0xweb/hardhat",
     "description": "Hardhat plugin for 0xweb",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "main": "./lib/index.js",
     "author": {
         "name": "Alex Kit",
@@ -20,6 +20,7 @@
     "dependencies": {
         "0xweb": "^0.9.25",
         "alot": "^0.3.0",
+        "atma-io": "^1.2.65",
         "memd": "^0.3.10"
     },
     "peerDependencies": {
@@ -60,7 +61,8 @@
             "alot",
             "atma-io",
             "0xweb",
-            "^hardhat"
+            "^hardhat",
+            "path"
         ],
         "middlewares": {
             "ts": [
