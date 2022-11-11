@@ -1,6 +1,6 @@
 const hh = require('hardhat');
 
 (async function() {
-    await hh.run('compile', { watch: 'true' });
+    await hh.run('compile');
     process.exit();
 }());
