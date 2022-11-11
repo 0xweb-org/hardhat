@@ -24,7 +24,7 @@ UTest({
             if (await Ctor.existsAsync(path)) {
                 await Ctor.removeAsync(path);
             }
-        })
+        }).toArrayAsync();
     },
     async $after () {
         await Directory.removeAsync(`${PROJ}/.git/`);

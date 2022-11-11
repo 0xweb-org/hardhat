@@ -7,7 +7,9 @@ import { Foo } from '@0xweb/hardhat/Foo/Foo';
     await Config.fetch()
 
     const provider = new HardhatProvider();
-    const foo = await provider.resolve<Foo>(Foo, 'Lorem');
+
+
+    const foo = await provider.deployClass<Foo>(Foo, { arguments: ['Lorem'] });
 
     '> Get initial value'
     let name = await foo.getName();
