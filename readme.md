@@ -59,7 +59,7 @@ import { HardhatProvider } from '@dequanto/hardhat/HardhatProvider'
 
 // automatically deploys the contract to hardhat chain
 const deployer = new HardhatProvider();
-const foo = await deployer.resolve(Foo);
+const foo = await deployer.deployClass<Foo>(Foo, { arguments: [ 'Hello' ] });
 
 // write
 const tx = await foo.setName('Hello world')
@@ -95,5 +95,6 @@ const text = await foo.name();
 
 - `npx hardhat compile --source /foo/bar/qux` - compiles solidity files which are located outside the `/contracts` folder
 - `npx hardhat compile --artifacts /dist` - set custom folder for artifacts (ABI JSONs and TS contracts)
+- `npx hardhat compile --watch` - Compile the sources and waits to recompile on changes
 
 ----
