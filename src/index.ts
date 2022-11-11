@@ -100,7 +100,9 @@ async function getCompiledAbis(config: { paths: { artifacts: string } }, compile
                     name: artifactName,
                     sourceFile: 'file://' + artifactPerFile.file.absolutePath
                 };
-            }).toArray();
+            })
+            .filter(x => x.sourceFile.includes('@openzeppelin') === false)
+            .toArray();
         }).toArray();
     }).toArray();
 
