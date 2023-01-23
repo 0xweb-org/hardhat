@@ -6,6 +6,7 @@ import { resolveConfig } from './config'
 import { TASK_0xWEB, TASK_0xWEB_GENERATE } from './constants'
 import { Directory } from 'atma-io'
 import { App } from '0xweb'
+import { $path } from './utils/$path';
 
 const taskArgsStore = { compileAll: false }
 
@@ -20,19 +21,19 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
     .setAction(async (compilationArgs, { run, config }, runSuper) => {
 
         if (compilationArgs.sources) {
-            config.paths.sources = path.join(process.cwd(), compilationArgs.sources);
+            config.paths.sources = $path.resolve(compilationArgs.sources);
         }
         if (compilationArgs.artifacts) {
-            config.paths.artifacts = path.join(process.cwd(), compilationArgs.artifacts);
+            config.paths.artifacts = $path.resolve(compilationArgs.artifacts);
         }
         if (compilationArgs.watch != null) {
 
             const directory = `file://${config.paths.sources}/`;
             Directory.watch(directory, async (...args) => {
-                console.log('XX', args);
                 await runSuper();
             });
             await runSuper();
+            // prevent from exit
             await new Promise(resolve => {});
             return;
         }
