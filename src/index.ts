@@ -1,5 +1,4 @@
 import alot from 'alot'
-import * as path from 'path';
 import { TASK_CLEAN, TASK_COMPILE, TASK_COMPILE_SOLIDITY_COMPILE_JOBS } from 'hardhat/builtin-tasks/task-names'
 import { extendConfig, subtask, task } from 'hardhat/config'
 import { resolveConfig } from './config'
@@ -18,13 +17,21 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
     .addOptionalParam('sources', 'Override the sources directory')
     .addOptionalParam('artifacts', 'Override the artifacts output directory')
     .addOptionalParam('watch', 'Re-runs compilation task on changes')
-    .setAction(async (compilationArgs, { run, config }, runSuper) => {
+    .setAction(async (compilationArgs, { run, config, artifacts }, runSuper) => {
 
         if (compilationArgs.sources) {
             config.paths.sources = $path.resolve(compilationArgs.sources);
         }
         if (compilationArgs.artifacts) {
-            config.paths.artifacts = $path.resolve(compilationArgs.artifacts);
+            const artifactsDir = $path.resolve(compilationArgs.artifacts);
+            const artifactsInstance = artifacts as (typeof artifacts & { _artifactsPath: string });
+
+            config.paths.artifacts = artifactsDir;
+            if (artifactsInstance._artifactsPath == null) {
+                console.error(`Articats Internal interface was changed. Trying to set private _artifactsPath, but it doesn't exist.`);
+            }
+            artifactsInstance._artifactsPath = artifactsDir;
+            config.paths.cache = $path.combine(artifactsDir, '../cache/');
         }
         if (compilationArgs.watch != null) {
 
@@ -41,7 +48,7 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
         await runSuper();
     });
 
-subtask(TASK_COMPILE_SOLIDITY_COMPILE_JOBS, 'Compiles the entire project, building all artifacts')
+subtask(TASK_COMPILE_SOLIDITY_COMPILE_JOBS, 'Compiles the entire project, building all artifacts and generating 0xweb TS classes')
     .setAction(async (taskArgs, { run }, runSuper) => {
         const compileSolOutput = await runSuper(taskArgs)
         await run(TASK_0xWEB_GENERATE, { compileSolOutput })
