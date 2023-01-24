@@ -33,10 +33,10 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
         if (rootDir != null) {
             rootDir = $path.resolve(rootDir);
             if (sourcesDir == null) {
-                sourcesDir = $path.join(rootDir, 'contracts');
+                sourcesDir = `file://${ $path.join(rootDir, 'contracts') }`;
             }
             if (artifactsDir == null) {
-                artifactsDir = $path.join(rootDir, 'artifacts');
+                artifactsDir = `file://${ $path.join(rootDir, 'artifacts') }`;
             }
             config.paths.root = rootDir;
             config.paths.cache = $path.join(rootDir, 'cache');
@@ -47,9 +47,7 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
         }
         if (artifactsDir) {
             artifactsDir = $path.resolve(artifactsDir);
-
-            config.paths.artifacts = $path.join(artifactsDir, './artifacts/');
-            config.paths.cache = $path.join(artifactsDir, './cache/');
+            config.paths.artifacts = artifactsDir
 
             // Re-set Artifacts Path manually, as Hardhat initializes the Artifacts Instance before this task runs.
             // Other paths (sources, cache) will be resolved later by hardhat from config
