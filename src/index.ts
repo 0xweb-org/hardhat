@@ -17,7 +17,7 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
     .addOptionalParam('sources', 'Override the sources directory')
     .addOptionalParam('artifacts', 'Override the artifacts output directory')
     .addOptionalParam('root', 'Overrides root directory. If sources is also overriden must be the sub-folder of the sources dir')
-    .addOptionalParam('watch', 'Re-runs compilation task on changes', true, <any> {
+    .addOptionalParam('watch', 'Re-runs compilation task on changes', false, <any> {
         name: 'boolean',
         validate(argName, argumentValue) {},
         parse (val) {
