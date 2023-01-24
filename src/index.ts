@@ -1,6 +1,7 @@
 import alot from 'alot'
 import { TASK_CLEAN, TASK_COMPILE, TASK_COMPILE_SOLIDITY_COMPILE_JOBS } from 'hardhat/builtin-tasks/task-names'
 import { extendConfig, subtask, task } from 'hardhat/config'
+
 import { resolveConfig } from './config'
 import { TASK_0xWEB, TASK_0xWEB_GENERATE } from './constants'
 import { Directory } from 'atma-io'
@@ -74,12 +75,16 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
 
             // Re-set Artifacts Path manually, as Hardhat initializes the Artifacts Instance before this task runs.
             // Other paths (sources, cache) will be resolved later by hardhat from config
-            const artifactsInstance = artifacts as (typeof artifacts & { _artifactsPath: string });
+            const artifactsInstance = artifacts as (typeof artifacts & { _artifactsPath: string, _validArtifacts: any[] });
             if (artifactsInstance._artifactsPath == null) {
                 console.error(`Articats Internal interface was changed. Trying to set private _artifactsPath, but it doesn't exist.`);
             }
             artifactsInstance._artifactsPath = artifactsDir;
+
+            // Clean artifacts from previous compile
+            artifactsInstance._validArtifacts = [];
         }
+
         if (compilationArgs.watch) {
             const directory = `file://${config.paths.sources}/`;
             Directory.watch(directory, async (...args) => {
