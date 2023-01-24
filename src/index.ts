@@ -18,11 +18,19 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
     .addOptionalParam('artifacts', 'Override the artifacts output directory')
     .addOptionalParam('root', 'Overrides root directory. If sources is also overriden must be the sub-folder of the sources dir')
     .addOptionalParam('watch', 'Re-runs compilation task on changes')
+    .addOptionalParam('tsgen', 'Skip the TypeScript class generation', true, {
+        name: 'boolean',
+        validate(argName, argumentValue) {}
+    })
     .setAction(async (
-        compilationArgs: { sources?: string, artifacts?: string, root?: string, watch?: boolean },
+        compilationArgs: { sources?: string, artifacts?: string, root?: string, watch?: boolean, tsgen?: boolean },
         { run, config, artifacts },
         runSuper
     ) => {
+
+        if (compilationArgs.tsgen === false) {
+            config['0xweb'].tsgen = false;
+        }
 
         let {
             sources: sourcesDir,
@@ -83,6 +91,10 @@ subtask(TASK_0xWEB_GENERATE)
     .setAction(async (a, b) => {
         let { compileSolOutput } = a;
         let { config, artifacts } = b;
+
+        if (config['0xweb'].tsgen === false) {
+            return;
+        }
 
         const contracts = await getCompiledAbis(config, compileSolOutput)
 
