@@ -47,6 +47,7 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
         if (compilationArgs.tsgen === false) {
             config['0xweb'].tsgen = false;
         }
+        ConfigHelper.resetPaths(config.paths);
 
         let {
             sources: sourcesDir,
@@ -196,4 +197,16 @@ async function getCompiledAbis(config: { paths: { artifacts: string } }, compile
         .filter(Boolean);
 
     return arr;
+}
+
+
+namespace ConfigHelper {
+    let $backup;
+    export function resetPaths (paths) {
+        if ($backup == null) {
+            $backup = { ...paths };
+            return;
+        }
+        Object.assign(paths, $backup);
+    }
 }
