@@ -16,22 +16,48 @@ extendConfig((config) => {
 task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
     .addOptionalParam('sources', 'Override the sources directory')
     .addOptionalParam('artifacts', 'Override the artifacts output directory')
+    .addOptionalParam('root', 'Overrides root directory. If sources is also overriden must be the sub-folder of the sources dir')
     .addOptionalParam('watch', 'Re-runs compilation task on changes')
-    .setAction(async (compilationArgs, { run, config, artifacts }, runSuper) => {
+    .setAction(async (
+        compilationArgs: { sources?: string, artifacts?: string, root?: string, watch?: boolean },
+        { run, config, artifacts },
+        runSuper
+    ) => {
 
-        if (compilationArgs.sources) {
-            config.paths.sources = $path.resolve(compilationArgs.sources);
+        let {
+            sources: sourcesDir,
+            artifacts: artifactsDir,
+            root: rootDir
+        } = compilationArgs;
+
+        if (rootDir != null) {
+            rootDir = $path.resolve(rootDir);
+            if (sourcesDir == null) {
+                sourcesDir = $path.join(rootDir, 'contracts');
+            }
+            if (artifactsDir == null) {
+                artifactsDir = $path.join(rootDir, 'artifacts');
+            }
+            config.paths.root = rootDir;
+            config.paths.cache = $path.join(rootDir, 'cache');
         }
-        if (compilationArgs.artifacts) {
-            const artifactsDir = $path.resolve(compilationArgs.artifacts);
-            const artifactsInstance = artifacts as (typeof artifacts & { _artifactsPath: string });
+        if (sourcesDir) {
+            sourcesDir = $path.resolve(sourcesDir);
+            config.paths.sources = sourcesDir;
+        }
+        if (artifactsDir) {
+            artifactsDir = $path.resolve(artifactsDir);
 
-            config.paths.artifacts = artifactsDir;
+            config.paths.artifacts = $path.join(artifactsDir, './artifacts/');
+            config.paths.cache = $path.join(artifactsDir, './cache/');
+
+            // Re-set Artifacts Path manually, as Hardhat initializes the Artifacts Instance before this task runs.
+            // Other paths (sources, cache) will be resolved later by hardhat from config
+            const artifactsInstance = artifacts as (typeof artifacts & { _artifactsPath: string });
             if (artifactsInstance._artifactsPath == null) {
                 console.error(`Articats Internal interface was changed. Trying to set private _artifactsPath, but it doesn't exist.`);
             }
             artifactsInstance._artifactsPath = artifactsDir;
-            config.paths.cache = $path.combine(artifactsDir, '../cache/');
         }
         if (compilationArgs.watch != null) {
 

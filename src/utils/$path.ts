@@ -8,7 +8,7 @@ export namespace $path {
         }
         return pathUtil.join(process.cwd(), path)
     }
-    export function combine (...paths: string[]) {
+    export function join (...paths: string[]) {
         return pathUtil.join(...paths);
     }
 }
