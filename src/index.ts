@@ -49,6 +49,16 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
         }
         ConfigHelper.resetPaths(config.paths);
 
+        // Re-set Artifacts Path manually, as Hardhat initializes the Artifacts Instance before this task runs.
+        // Other paths (sources, cache) will be resolved later by hardhat from config
+        const artifactsInstance = artifacts as (typeof artifacts & { _artifactsPath: string, _validArtifacts: any[] });
+        if (artifactsInstance._artifactsPath == null) {
+            console.error(`Articats Internal interface was changed. Trying to set private _artifactsPath, but it doesn't exist.`);
+        }
+        // Clean artifacts from previous compile
+        artifactsInstance._validArtifacts = [];
+        artifactsInstance._artifactsPath = config.paths.artifacts;
+
         let {
             sources: sourcesDir,
             artifacts: artifactsDir,
@@ -74,16 +84,8 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
             artifactsDir = $path.resolve(artifactsDir);
             config.paths.artifacts = artifactsDir
 
-            // Re-set Artifacts Path manually, as Hardhat initializes the Artifacts Instance before this task runs.
-            // Other paths (sources, cache) will be resolved later by hardhat from config
-            const artifactsInstance = artifacts as (typeof artifacts & { _artifactsPath: string, _validArtifacts: any[] });
-            if (artifactsInstance._artifactsPath == null) {
-                console.error(`Articats Internal interface was changed. Trying to set private _artifactsPath, but it doesn't exist.`);
-            }
-            artifactsInstance._artifactsPath = artifactsDir;
 
-            // Clean artifacts from previous compile
-            artifactsInstance._validArtifacts = [];
+            artifactsInstance._artifactsPath = artifactsDir;
         }
 
         if (compilationArgs.watch) {
