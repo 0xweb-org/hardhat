@@ -17,10 +17,25 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
     .addOptionalParam('sources', 'Override the sources directory')
     .addOptionalParam('artifacts', 'Override the artifacts output directory')
     .addOptionalParam('root', 'Overrides root directory. If sources is also overriden must be the sub-folder of the sources dir')
-    .addOptionalParam('watch', 'Re-runs compilation task on changes')
-    .addOptionalParam('tsgen', 'Skip the TypeScript class generation', true, {
+    .addOptionalParam('watch', 'Re-runs compilation task on changes', true, <any> {
         name: 'boolean',
-        validate(argName, argumentValue) {}
+        validate(argName, argumentValue) {},
+        parse (val) {
+            if (val === '' || val === '1' || val === true || val === 'true') {
+                return true;
+            }
+            return false;
+        }
+    })
+    .addOptionalParam('tsgen', 'Skip the TypeScript class generation', true, <any> {
+        name: 'boolean',
+        validate(argName, argumentValue) {},
+        parse (val) {
+            if (val === '0' || val === 0 || val === false || val === 'false') {
+                return false;
+            }
+            return true;
+        }
     })
     .setAction(async (
         compilationArgs: { sources?: string, artifacts?: string, root?: string, watch?: boolean, tsgen?: boolean },
@@ -65,8 +80,7 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
             }
             artifactsInstance._artifactsPath = artifactsDir;
         }
-        if (compilationArgs.watch != null) {
-
+        if (compilationArgs.watch) {
             const directory = `file://${config.paths.sources}/`;
             Directory.watch(directory, async (...args) => {
                 await runSuper();
