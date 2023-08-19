@@ -17,7 +17,7 @@ extendConfig((config) => {
 task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
     .addOptionalParam('sources', 'Override the sources directory')
     .addOptionalParam('artifacts', 'Override the artifacts output directory')
-    .addOptionalParam('root', 'Overrides root directory. If sources is also overriden must be the sub-folder of the sources dir')
+    .addOptionalParam('root', 'Overrides root directory. If sources is also overridden must be the sub-folder of the sources dir')
     .addOptionalParam('watch', 'Re-runs compilation task on changes', false, <any> {
         name: 'boolean',
         validate(argName, argumentValue) {},
@@ -30,9 +30,9 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
     })
     .addOptionalParam('tsgen', 'Skip the TypeScript class generation', true, <any> {
         name: 'boolean',
-        validate(argName, argumentValue) {},
-        parse (val) {
-            if (val === '0' || val === 0 || val === false || val === 'false') {
+        validate(key, value) {},
+        parse (key, value) {
+            if (value === '0' || value === 0 || value === false || value === 'false') {
                 return false;
             }
             return true;
@@ -53,7 +53,7 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
         // Other paths (sources, cache) will be resolved later by hardhat from config
         const artifactsInstance = artifacts as (typeof artifacts & { _artifactsPath: string, _validArtifacts: any[] });
         if (artifactsInstance._artifactsPath == null) {
-            console.error(`Articats Internal interface was changed. Trying to set private _artifactsPath, but it doesn't exist.`);
+            console.error(`Artifacts Internal interface was changed. Trying to set private _artifactsPath, but it doesn't exist.`);
         }
         // Clean artifacts from previous compile
         artifactsInstance._validArtifacts = [];
@@ -159,7 +159,7 @@ async function getCompiledAbis(config: { paths: { artifacts: string } }, compile
     }[]
 }): Promise<{ name: string, path: string }[]> {
 
-    const emitedArtifacts = alot(compileSolOutput.artifactsEmittedPerJob).mapMany((a) => {
+    const emittedArtifacts = alot(compileSolOutput.artifactsEmittedPerJob).mapMany((a) => {
         return alot(a.artifactsEmittedPerFile).mapMany((artifactPerFile) => {
             return alot(artifactPerFile.artifactsEmitted).map((artifactName) => {
                 return {
@@ -172,7 +172,7 @@ async function getCompiledAbis(config: { paths: { artifacts: string } }, compile
         }).toArray();
     }).toArray();
 
-    let namesHash = alot(emitedArtifacts).toDictionary(x => x.name);
+    let namesHash = alot(emittedArtifacts).toDictionary(x => x.name);
     let files = await Directory.readFilesAsync(`file://${config.paths.artifacts}/`, '**.json');
     let compileAll = taskArgsStore.compileAll;
     let arr = files
