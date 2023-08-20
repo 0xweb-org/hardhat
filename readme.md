@@ -93,8 +93,9 @@ const text = await foo.name();
 
 # Additional parameters
 
-- `npx hardhat compile --source /foo/bar/qux` - compiles solidity files which are located outside the `/contracts` folder
+- `npx hardhat compile --sources /foo/bar/qux` - compiles solidity files which are located outside the `/contracts` folder
 - `npx hardhat compile --artifacts /dist` - set custom folder for artifacts (ABI JSONs and TS contracts)
 - `npx hardhat compile --watch` - Compile the sources and waits to recompile on changes
+- `npx hardhat compile --tsgen false` - Do not generate the TS classes
 
 ----
