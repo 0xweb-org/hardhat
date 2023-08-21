@@ -18,7 +18,8 @@
     ],
     "license": "MIT",
     "dependencies": {
-        "0xweb": "^0.9.91",
+        "@0xweb/hardhat": "^0.1.16",
+        "0xweb": "^0.9.92",
         "alot": "^0.3.0",
         "atma-io": "^1.2.65",
         "memd": "^0.3.10"

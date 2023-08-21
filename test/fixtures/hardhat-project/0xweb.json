@@ -1,9 +1,22 @@
 {
   "contracts": {
     "hardhat": {
-      "file://D:/eth/0xweb-hardhat/test/fixtures/hardhat-project/artifacts/contracts/Foo.sol/Foo.json": {
+      "test/fixtures/hardhat-project/artifacts/contracts/Foo.sol/Foo.json": {
         "name": "Foo",
         "main": "./0xweb/hardhat/Foo/Foo.ts"
+      }
+    }
+  },
+  "dependencies": {
+    "Foo": {
+      "main": "./0xweb/hardhat/Foo/Foo.ts",
+      "source": {
+        "path": "test/fixtures/hardhat-project/artifacts/contracts/Foo.sol/Foo.json"
+      },
+      "deployments": {
+        "hardhat": {
+          "address": null
+        }
       }
     }
   }
