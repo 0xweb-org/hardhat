@@ -19,7 +19,13 @@ UTest({
             command: 'node --openssl-legacy-provider compile.js',
             cwd: PROJ
         });
-        let content = await File.readAsync(`${PROJ_0xWEB}/hardhat/Foo/Foo.ts`, { skipHooks: true });
+        let path = `${PROJ_0xWEB}/hardhat/Foo/Foo.ts`;
+        if (await File.existsAsync(path) === false) {
+            console.log('stdout', result.stdout);
+            console.log('stderr', result.stderr);
+            throw new Error(`File ${path} not found`);
+        }
+        let content = await File.readAsync(path, { skipHooks: true });
         has_(content, 'class Foo extends ContractBase');
     }
 })
