@@ -3,7 +3,7 @@ import { Directory } from 'atma-io'
 import { App } from '0xweb'
 
 import { TASK_CLEAN, TASK_COMPILE, TASK_COMPILE_SOLIDITY_COMPILE_JOBS } from 'hardhat/builtin-tasks/task-names'
-import { extendConfig, subtask, task } from 'hardhat/config'
+import { extendConfig, subtask, task, types } from 'hardhat/config'
 
 import { resolveConfig } from './config'
 import { TASK_0xWEB, TASK_0xWEB_GENERATE } from './constants'
@@ -20,26 +20,9 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
     .addOptionalParam('artifacts', 'Override the artifacts output directory')
     .addOptionalParam('root', 'Overrides root directory. If sources is also overridden must be the sub-folder of the sources dir')
     .addOptionalParam('package', 'Compile the contracts within a specific mono-repo package. Artifacts and 0xc classes will be placed in the package directory')
-    .addOptionalParam('watch', 'Re-runs compilation task on changes', false, <any> {
-        name: 'boolean',
-        validate(argName, argumentValue) {},
-        parse (val) {
-            if (val === '' || val === '1' || val === true || val === 'true') {
-                return true;
-            }
-            return false;
-        }
-    })
-    .addOptionalParam('tsgen', 'Skip the TypeScript class generation', true, <any> {
-        name: 'boolean',
-        validate(key, value) {},
-        parse (key, value) {
-            if (value === '0' || value === 0 || value === false || value === 'false') {
-                return false;
-            }
-            return true;
-        }
-    })
+    .addOptionalParam('tsgen', 'Skip the TypeScript class generation', true, types.boolean)
+    .addFlag('watch', 'Watch sources directory and reruns compilation task on changes')
+
     .setAction(async (
         compilationArgs: {
             sources?: string
