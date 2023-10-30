@@ -1,11 +1,12 @@
 import alot from 'alot'
+import { Directory } from 'atma-io'
+import { App } from '0xweb'
+
 import { TASK_CLEAN, TASK_COMPILE, TASK_COMPILE_SOLIDITY_COMPILE_JOBS } from 'hardhat/builtin-tasks/task-names'
 import { extendConfig, subtask, task } from 'hardhat/config'
 
 import { resolveConfig } from './config'
 import { TASK_0xWEB, TASK_0xWEB_GENERATE } from './constants'
-import { Directory } from 'atma-io'
-import { App } from '0xweb'
 import { $path } from './utils/$path';
 
 const taskArgsStore = { compileAll: false }
@@ -18,6 +19,7 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
     .addOptionalParam('sources', 'Override the sources directory')
     .addOptionalParam('artifacts', 'Override the artifacts output directory')
     .addOptionalParam('root', 'Overrides root directory. If sources is also overridden must be the sub-folder of the sources dir')
+    .addOptionalParam('package', 'Compile the contracts within a specific mono-repo package. Artifacts and 0xc classes will be placed in the package directory')
     .addOptionalParam('watch', 'Re-runs compilation task on changes', false, <any> {
         name: 'boolean',
         validate(argName, argumentValue) {},
@@ -39,15 +41,34 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
         }
     })
     .setAction(async (
-        compilationArgs: { sources?: string, artifacts?: string, root?: string, watch?: boolean, tsgen?: boolean },
+        compilationArgs: {
+            sources?: string
+            artifacts?: string
+            root?: string
+            watch?: boolean
+            tsgen?: boolean
+            package?: string
+        },
         { run, config, artifacts },
         runSuper
     ) => {
 
+        ConfigHelper.resetPaths(config.paths);
+
         if (compilationArgs.tsgen === false) {
             config['0xweb'].tsgen = false;
         }
-        ConfigHelper.resetPaths(config.paths);
+        if (compilationArgs.package != null) {
+            config['0xweb'].package = compilationArgs.package;
+
+            if (compilationArgs.artifacts == null) {
+                compilationArgs.artifacts = $path.join(compilationArgs.package, 'artifacts');
+            }
+            if (compilationArgs.sources == null) {
+                compilationArgs.sources = $path.join(compilationArgs.sources, 'contracts');
+            }
+        }
+
 
         // Re-set Artifacts Path manually, as Hardhat initializes the Artifacts Instance before this task runs.
         // Other paths (sources, cache) will be resolved later by hardhat from config
@@ -83,8 +104,6 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
         if (artifactsDir) {
             artifactsDir = $path.resolve(artifactsDir);
             config.paths.artifacts = artifactsDir
-
-
             artifactsInstance._artifactsPath = artifactsDir;
         }
 
@@ -119,14 +138,22 @@ subtask(TASK_0xWEB_GENERATE)
         }
 
         const contracts = await getCompiledAbis(config, compileSolOutput)
-
+        const pkg = config['0xweb'].package;
         const app = new App();
         await alot(contracts)
             .forEachAsync(async (contract, i) => {
                 console.log(`Generation ${contract.name}(${contract.path}) ${i}/${contracts.length}`);
-                await app.execute([`install`, `${contract.path}`, '--name', contract.name, '--chain', 'hardhat'])
+                const params = [
+                    `install`, `${contract.path}`,
+                    '--name', contract.name,
+                    '--chain', 'hardhat'
+                ];
+                if (pkg != null) {
+                    params.push('--output', $path.join(pkg, '0xc'));
+                }
+                await app.execute(params);
             })
-            .toArrayAsync({ threads: 1 })
+            .toArrayAsync({ threads: 4 })
     });
 
 task(TASK_0xWEB, 'Generate 0xWeb classes for compiled contracts')
@@ -140,7 +167,7 @@ task(TASK_CLEAN, 'Clears the cache and deletes all artifacts')
         if (global) {
             return;
         }
-        const dir = `/0xweb/hardhat/`;
+        const dir = `/0xc/hardhat/`;
         if (await Directory.existsAsync(dir)) {
             await Directory.removeAsync(dir);
         }
