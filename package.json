@@ -1,7 +1,7 @@
 {
     "name": "@0xweb/hardhat",
-    "description": "Hardhat plugin for 0xweb",
-    "version": "0.1.16",
+    "description": "0xweb plugin for Hardhat",
+    "version": "0.1.17",
     "main": "./lib/index.js",
     "author": {
         "name": "Alex Kit",
@@ -18,16 +18,12 @@
     ],
     "license": "MIT",
     "dependencies": {
-        "@0xweb/hardhat": "^0.1.16",
-        "0xweb": "^0.9.97",
+        "0xweb": "^0.10.12",
         "alot": "^0.3.0",
         "atma-io": "^1.2.65",
         "memd": "^0.3.10"
     },
     "peerDependencies": {
-        "@nomiclabs/hardhat-etherscan": ">=3.0.3",
-        "@nomiclabs/hardhat-waffle": ">=2.0.3",
-        "@nomiclabs/hardhat-web3": ">=2.0.0",
         "hardhat": ">=2.9.3"
     },
     "scripts": {
