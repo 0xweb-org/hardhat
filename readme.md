@@ -1,8 +1,8 @@
-# [`0xWeb`](https://0xweb.org) plugin for [Hardhat](https://hardhat.org/)
+# [`0xweb`](https://0xweb.org) plugin for [Hardhat](https://hardhat.org/)
 
 
 ----
-[![npm version](https://badge.fury.io/js/@0xweb%2Fhardhat.svg)](https://badge.fury.io/js/@0xweb%2Fhardhat)
+[![npm version](https://badge.fury.io/js/0xc%2Fhardhat.svg)](https://badge.fury.io/js/0xc%2Fhardhat)
 [![CircleCI](https://circleci.com/gh/0xweb-org/hardhat.svg?style=svg)](https://circleci.com/gh/0xweb-org/hardhat)
 
 
@@ -21,7 +21,7 @@ The plugin generates `0xWeb` classes for compiled solidity contracts, making the
 # install 0xweb
 $ npm i 0xweb -g
 
-# initiallize 0xweb and hardhat project
+# initialize 0xweb and hardhat project
 $ 0xweb init --hardhat
 ```
 
@@ -41,7 +41,6 @@ contract Foo {
         name = _name;
     }
 }
-
 ```
 
 > Plugin adds also ability to specify the `sources` folder. As per default this is `/contracts/**.sol`
@@ -54,7 +53,7 @@ $ npx hardhat compile --sources ./any/directory/
 
 > `example.ts`
 ```ts
-import { Foo } from '@0xweb/hardhat/Foo/Foo.ts'
+import { Foo } from '0xc/hardhat/Foo/Foo.ts'
 import { HardhatProvider } from '@dequanto/hardhat/HardhatProvider'
 
 // automatically deploys the contract to hardhat chain
@@ -76,7 +75,7 @@ If the contract is already deployed, initialize the contract with the Address as
 
 > `example.ts`
 ```ts
-import { Foo } from '@0xweb/hardhat/Foo/Foo.ts'
+import { Foo } from '0xc/hardhat/Foo/Foo.ts'
 import { EthWeb3Client } from '@dequanto/clients/EthWeb3Client'
 
 
@@ -97,5 +96,6 @@ const text = await foo.name();
 - `npx hardhat compile --artifacts /dist` - set custom folder for artifacts (ABI JSONs and TS contracts)
 - `npx hardhat compile --watch` - Compile the sources and waits to recompile on changes
 - `npx hardhat compile --tsgen false` - Do not generate the TS classes
+- `npx hardhat compile --package path/to/package/folder` - You can split your project into packages, and with the command compile the contracts in a package, the sources will be searched in that directory, and the artifacts output will be written to that directory
 
 ----
