@@ -1,6 +1,4 @@
 
-require("@nomiclabs/hardhat-web3");
-require("@nomiclabs/hardhat-waffle");
 require('../../../lib/index');
 
 module.exports = {

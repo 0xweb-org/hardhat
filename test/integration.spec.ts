@@ -4,7 +4,7 @@ import alot from 'alot';
 
 const PROJ = `./test/fixtures/integration/`;
 const PROJ_ARTIFACTS = `${PROJ}/artifacts/`;
-const PROJ_0xWEB = `${PROJ}/0xweb/`;
+const PROJ_0xWEB = `${PROJ}/0xc/`;
 const PROJ_DEQUANTO = `${PROJ}/dequanto/`;
 UTest({
     $config: {

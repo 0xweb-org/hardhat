@@ -3,7 +3,7 @@ import { File, Directory } from 'atma-io'
 
 const PROJ = `./test/fixtures/hardhat-project/`;
 const PROJ_ARTIFACTS = `${PROJ}/artifacts/`;
-const PROJ_0xWEB = `${PROJ}/0xweb/`;
+const PROJ_0xWEB = `${PROJ}/0xc/`;
 UTest({
     async $before () {
         if (Directory.exists(PROJ_ARTIFACTS)) {
