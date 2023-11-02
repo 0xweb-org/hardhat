@@ -48,8 +48,9 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
                 compilationArgs.artifacts = $path.join(compilationArgs.package, 'artifacts');
             }
             if (compilationArgs.sources == null) {
-                compilationArgs.sources = $path.join(compilationArgs.sources, 'contracts');
+                compilationArgs.sources = $path.join(compilationArgs.package, 'contracts');
             }
+            config.paths.cache = $path.join(compilationArgs.package, 'cache');
         }
 
 
