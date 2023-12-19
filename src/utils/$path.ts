@@ -9,6 +9,6 @@ export namespace $path {
         return pathUtil.join(process.cwd(), path)
     }
     export function join (...paths: string[]) {
-        return pathUtil.join(...paths);
+        return pathUtil.join(...paths).replace(/\\/g, '/');
     }
 }

@@ -147,12 +147,20 @@ task(TASK_0xWEB, 'Generate 0xWeb classes for compiled contracts')
     });
 
 task(TASK_CLEAN, 'Clears the cache and deletes all artifacts')
-    .setAction(async ({ global }: { global: boolean }, { config }, runSuper) => {
-        if (global) {
+    .addOptionalParam('package', 'Optionally clears the 0xc classes for a specific mono-repo package')
+    .setAction(async (cliArgs: { global?: boolean, package?: string }, { config }, runSuper) => {
+        if (cliArgs.global) {
             return;
         }
-        const dir = `/0xc/hardhat/`;
+        let dir = `/0xc/hardhat/`;
+
+        if (cliArgs.package != null) {
+            config.paths.artifacts = $path.join(config.paths.root, cliArgs.package, 'artifacts/');
+            config.paths.cache = $path.join(config.paths.root, cliArgs.package, 'cache/');
+            dir = $path.join(cliArgs.package, dir);
+        }
         if (await Directory.existsAsync(dir)) {
+            console.log(`Clearing ${dir}`);
             await Directory.removeAsync(dir);
         }
         await runSuper()
