@@ -3,6 +3,7 @@ import { File, Directory } from 'atma-io'
 import alot from 'alot';
 
 const PROJ = `./test/fixtures/integration/`;
+const PROJ_GIT = `${PROJ}/.git/`;
 const PROJ_ARTIFACTS = `${PROJ}/artifacts/`;
 const PROJ_0xWEB = `${PROJ}/0xc/`;
 const PROJ_DEQUANTO = `${PROJ}/dequanto/`;
@@ -12,6 +13,7 @@ UTest({
     },
     async $before () {
         let clean = [
+            PROJ_GIT,
             PROJ_ARTIFACTS,
             PROJ_0xWEB,
             PROJ_DEQUANTO,
@@ -27,7 +29,7 @@ UTest({
         }).toArrayAsync();
     },
     async $after () {
-        await Directory.removeAsync(`${PROJ}/.git/`);
+        await Directory.removeAsync(PROJ_GIT);
         await File.removeAsync(`${PROJ}/.gitmodules`);
     },
     async 'should initialize and compile the project' () {
