@@ -18,7 +18,7 @@
     ],
     "license": "MIT",
     "dependencies": {
-        "0xweb": "^0.10.13",
+        "0xweb": "^0.10.38",
         "alot": "^0.3.0",
         "atma-io": "^1.2.65",
         "memd": "^0.3.10"
@@ -30,7 +30,7 @@
         "build": "app-bundler",
         "watch": "app-bundler --watch",
         "test": "atma --openssl-legacy-provider test",
-        "release": "echo \"Run atma pub -m \"message\"\""
+        "release": "atma bump && npm run build && git add -A && git commit -am 'bump' && git push && git push origin master:release"
     },
     "devDependencies": {
         "app-bundler": "^0.1.7",

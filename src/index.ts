@@ -126,11 +126,12 @@ subtask(TASK_0xWEB_GENERATE)
         const app = new App();
         await alot(contracts)
             .forEachAsync(async (contract, i) => {
-                console.log(`Generation ${contract.name}(${contract.path}) ${i}/${contracts.length}`);
+                console.log(`Generate ${contract.name}(${contract.path}) ${i}/${contracts.length}`);
                 const params = [
                     `install`, `${contract.path}`,
                     '--name', contract.name,
-                    '--chain', 'hardhat'
+                    '--chain', 'hardhat',
+                    '--save-sources', false
                 ];
                 if (pkg != null) {
                     params.push('--output', $path.join(pkg, '0xc'));
