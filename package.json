@@ -1,7 +1,7 @@
 {
     "name": "@0xweb/hardhat",
     "description": "0xweb plugin for Hardhat",
-    "version": "0.1.21",
+    "version": "0.1.22",
     "main": "./lib/index.js",
     "author": {
         "name": "Alex Kit",
