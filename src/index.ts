@@ -94,9 +94,19 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
         if (compilationArgs.watch) {
             const directory = `file://${config.paths.sources}/`;
             Directory.watch(directory, async (...args) => {
-                await runSuper();
+                try {
+                    await runSuper();
+                } catch (error) {
+                    console.log(`Compilation failed`, error);
+                    console.log(`Watching...`);
+                }
             });
-            await runSuper();
+            try {
+                await runSuper();
+            } catch (error) {
+                console.log(`Compilation failed`, error);
+                console.log(`Watching...`);
+            }
             // prevent from exit
             await new Promise(resolve => {});
             return;
