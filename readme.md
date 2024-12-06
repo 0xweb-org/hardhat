@@ -2,7 +2,7 @@
 
 
 ----
-[![npm version](https://badge.fury.io/js/@0xweb/hardhat.svg)](https://badge.fury.io/js/@0xweb/hardhat)
+[![npm version](https://badge.fury.io/js/@0xweb%2Fhardhat.svg)](https://badge.fury.io/js/@0xweb%2Fhardhat)
 [![CircleCI](https://circleci.com/gh/0xweb-org/hardhat.svg?style=svg)](https://circleci.com/gh/0xweb-org/hardhat)
 
 
