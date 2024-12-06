@@ -3,3 +3,4 @@ package.json
 package-lock.json
 hardhat.config.js
 tsconfig.json
+tsconfig-atma.json

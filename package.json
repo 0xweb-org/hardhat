@@ -18,9 +18,9 @@
     ],
     "license": "MIT",
     "dependencies": {
-        "0xweb": "^0.10.40",
+        "0xweb": "^0.10.69",
         "alot": "^0.3.0",
-        "atma-io": "^1.2.65",
+        "atma-io": "^1.3.5",
         "memd": "^0.3.10"
     },
     "peerDependencies": {
@@ -33,8 +33,9 @@
         "release": "atma bump && npm run build && git add -A && git commit -am 'bump' && git push && git push origin master:release"
     },
     "devDependencies": {
-        "app-bundler": "^0.1.7",
-        "atma": "^0.15.17",
+        "app-bundler": "^0.2.14",
+        "atma": "^0.15.23",
+        "atma-loader-ts": "^1.2.7",
         "shellbee": "^0.5.22"
     },
     "app-bundler": {

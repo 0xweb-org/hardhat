@@ -1,4 +1,4 @@
-import { Config } from '@dequanto/Config';
+import { Config } from '@dequanto/config/Config';
 import { HardhatProvider } from '@dequanto/hardhat/HardhatProvider';
 import { Foo } from '0xc/hardhat/Foo/Foo';
 

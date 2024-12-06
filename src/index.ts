@@ -227,7 +227,7 @@ async function getCompiledAbis(config: {
                     return shouldInstall;
                 }
                 if (sources != null) {
-                    return x.sourceFile.toLowerCase().startsWith(`file://${sources}`);
+                    return x.sourceFile.toLowerCase().startsWith(`file://${sources.toLowerCase()}`);
                 }
                 return false;
             })
