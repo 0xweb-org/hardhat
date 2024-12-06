@@ -21,6 +21,7 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
     .addOptionalParam('root', 'Overrides root directory. If sources is also overridden must be the sub-folder of the sources dir')
     .addOptionalParam('package', 'Compile the contracts within a specific mono-repo package. Artifacts and 0xc classes will be placed in the package directory')
     .addOptionalParam('tsgen', 'Skip the TypeScript class generation', true, types.boolean)
+    .addOptionalParam('install', 'CSV sol path to install, default installs all compiled contracts from sources')
     .addFlag('watch', 'Watch sources directory and reruns compilation task on changes')
 
     .setAction(async (
@@ -30,6 +31,7 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
             root?: string
             watch?: boolean
             tsgen?: boolean
+            install?: string
             package?: string
         },
         { run, config, artifacts },
@@ -40,6 +42,9 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
 
         if (compilationArgs.tsgen === false) {
             config['0xweb'].tsgen = false;
+        }
+        if (compilationArgs.install != null) {
+            config['0xweb'].install = compilationArgs.install;
         }
         if (compilationArgs.package != null) {
             config['0xweb'].package = compilationArgs.package;
@@ -177,7 +182,18 @@ task(TASK_CLEAN, 'Clears the cache and deletes all artifacts')
         await runSuper()
     });
 
-async function getCompiledAbis(config: { paths: { artifacts: string } }, compileSolOutput: {
+async function getCompiledAbis(config: {
+    paths: {
+        // system path directory with the artifacts output
+        artifacts: string
+        // system path directory with the contract sources
+        sources: string
+    }
+    '0xweb': {
+        // SOL files or contract names as CSV
+        install: string
+    }
+}, compileSolOutput: {
     artifactsEmittedPerJob: {
         artifactsEmittedPerFile: {
             file: {
@@ -188,36 +204,55 @@ async function getCompiledAbis(config: { paths: { artifacts: string } }, compile
         }[]
     }[]
 }): Promise<{ name: string, path: string }[]> {
+    const sources = config.paths.sources;
+    const installs = config['0xweb']?.install?.split(',').map(x => x.trim()) ?? null;
 
     const emittedArtifacts = alot(compileSolOutput.artifactsEmittedPerJob).mapMany((a) => {
         return alot(a.artifactsEmittedPerFile).mapMany((artifactPerFile) => {
             return alot(artifactPerFile.artifactsEmitted).map((artifactName) => {
                 return {
-                    name: artifactName,
+                    // Contract Name
+                    artifactName: artifactName,
+                    // Contract local path, aka import
+                    sourceName: artifactPerFile.file.sourceName,
+                    // Contract system path, aka file path
                     sourceFile: 'file://' + artifactPerFile.file.absolutePath
                 };
             })
-            .filter(x => x.sourceFile.includes('@openzeppelin') === false)
+            .filter(x => {
+                if (installs != null) {
+                    let shouldInstall = installs.some(toInstall => {
+                        return x.artifactName === toInstall || x.sourceName?.toLowerCase() === toInstall.toLowerCase()
+                    });
+                    return shouldInstall;
+                }
+                if (sources != null) {
+                    return x.sourceFile.toLowerCase().startsWith(`file://${sources}`);
+                }
+                return false;
+            })
+            //.filter(x => x.sourceFile.includes('@openzeppelin') === false)
             .toArray();
         }).toArray();
     }).toArray();
 
-    let namesHash = alot(emittedArtifacts).toDictionary(x => x.name);
+    let namesHash = alot(emittedArtifacts).toDictionary(x => x.artifactName);
     let files = await Directory.readFilesAsync(`file://${config.paths.artifacts}/`, '**.json');
     let compileAll = taskArgsStore.compileAll;
     let arr = files
         .map(file => {
             let path = file.uri.toString();
 
-            let match = /(?<name>[^\\\/]+)\.sol[\\\/]/.exec(path);
+            let match = /(?<sourceFileName>[^\\\/]+)\.sol[\\\/]/.exec(path);
             if (match == null) {
                 return null;
             }
-            let name = match.groups.name;
+            // assume artifactName === sourceFileName @TODO consider to handle different file-contract names
+            let name = match.groups.sourceFileName;
             if (compileAll !== true && name in namesHash === false) {
                 return null;
             }
-            if (new RegExp(`${name}\\.json$`).test(path) === false) {
+            if (new RegExp(`[\\\/]${name}\\.json$`).test(path) === false) {
                 return null;
             }
 
