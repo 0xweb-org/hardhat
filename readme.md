@@ -2,7 +2,7 @@
 
 
 ----
-[![npm version](https://badge.fury.io/js/0xc%2Fhardhat.svg)](https://badge.fury.io/js/0xc%2Fhardhat)
+[![npm version](https://badge.fury.io/js/@0xweb/hardhat.svg)](https://badge.fury.io/js/@0xweb/hardhat)
 [![CircleCI](https://circleci.com/gh/0xweb-org/hardhat.svg?style=svg)](https://circleci.com/gh/0xweb-org/hardhat)
 
 
@@ -95,7 +95,7 @@ const text = await foo.name();
 - `npx hardhat compile --sources /foo/bar/qux` - compiles solidity files which are located outside the `/contracts` folder
 - `npx hardhat compile --artifacts /dist` - set custom folder for artifacts (ABI JSONs and TS contracts)
 - `npx hardhat compile --watch` - Compile the sources and waits to recompile on changes
-- `npx hardhat compile --tsgen false` - Do not generate the TS classes
 - `npx hardhat compile --package path/to/package/folder` - You can split your project into packages, and with the command compile the contracts in a package, the sources will be searched in that directory, and the artifacts output will be written to that directory
-
+- `npx hardhat compile --tsgen false` - Do not generate the TS classes. Installs all the contracts from the sources directory.
+- `npx hardhat compile --install TimelockController` - Installs only specified Artifact name or *.sol paths. Comma separated.
 ----
