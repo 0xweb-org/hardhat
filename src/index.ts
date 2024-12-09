@@ -141,7 +141,7 @@ subtask(TASK_0xWEB_GENERATE)
         const app = new App();
         await alot(contracts)
             .forEachAsync(async (contract, i) => {
-                console.log(`Generate ${contract.name}(${contract.path}) ${i}/${contracts.length}`);
+                console.log(`⏳ Generate ${contract.name}(${contract.path}) ${i}/${contracts.length}`);
                 const params = [
                     `install`, `${contract.path}`,
                     '--name', contract.name,
@@ -189,9 +189,9 @@ async function getCompiledAbis(config: {
         // system path directory with the contract sources
         sources: string
     }
-    '0xweb': {
+    '0xweb'?: {
         // SOL files or contract names as CSV
-        install: string
+        install?: string
     }
 }, compileSolOutput: {
     artifactsEmittedPerJob: {
@@ -227,7 +227,7 @@ async function getCompiledAbis(config: {
                     return shouldInstall;
                 }
                 if (sources != null) {
-                    return x.sourceFile.toLowerCase().startsWith(`file://${sources.toLowerCase()}`);
+                    return $path.normalize(x.sourceFile).toLowerCase().startsWith(`file://${$path.normalize(sources).toLowerCase()}`);
                 }
                 return false;
             })
