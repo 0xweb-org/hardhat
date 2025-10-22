@@ -45,7 +45,7 @@ UTest({
             });
         }
         await run({
-            command: '0xweb init --hardhat',
+            command: '0xweb init --hardhat --atma',
             cwd: PROJ
         });
 
