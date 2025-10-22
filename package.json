@@ -1,7 +1,7 @@
 {
     "name": "@0xweb/hardhat",
     "description": "0xweb plugin for Hardhat",
-    "version": "0.1.30",
+    "version": "0.1.31",
     "main": "./lib/index.js",
     "author": {
         "name": "Alex Kit",
@@ -18,7 +18,7 @@
     ],
     "license": "MIT",
     "dependencies": {
-        "0xweb": "^0.11.1",
+        "0xweb": "^0.11.2",
         "alot": "^0.3.0",
         "atma-io": "^1.3.5",
         "memd": "^0.3.10"
