@@ -19,6 +19,7 @@ UTest({
             PROJ_DEQUANTO,
             `${PROJ}/node_modules/`,
             `${PROJ}/package.json`,
+            `${PROJ}/package-lock.json`,
             `${PROJ}/hardhat.config.js`,
         ];
         await alot(clean).forEachAsync(async path => {

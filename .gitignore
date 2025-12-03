@@ -1,3 +1,9 @@
 node_modules
 test/tmp
 test/fixtures/**/.gitmodules
+/cache/
+/coverage/
+/artifacts/
+/coverage.json
+/0xweb.json
+/0xc

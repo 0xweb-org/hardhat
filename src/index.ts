@@ -6,8 +6,10 @@ import { TASK_CLEAN, TASK_COMPILE, TASK_COMPILE_SOLIDITY_COMPILE_JOBS } from 'ha
 import { extendConfig, subtask, task, types } from 'hardhat/config'
 
 import { resolveConfig } from './config'
-import { TASK_0xWEB, TASK_0xWEB_GENERATE } from './constants'
+import { TASK_0xWEB, TASK_0xWEB_GENERATE, TASK_COVERAGE } from './constants'
 import { $path } from './utils/$path';
+import { $coverage } from './coverage/$coverage'
+import { $command } from './utils/$command'
 
 const taskArgsStore = { compileAll: false }
 
@@ -156,10 +158,35 @@ subtask(TASK_0xWEB_GENERATE)
             .toArrayAsync({ threads: 4 })
     });
 
-task(TASK_0xWEB, 'Generate 0xWeb classes for compiled contracts')
+
+task(TASK_0xWEB, 'Generate 0xweb classes for compiled contracts')
     .setAction(async (_, { run }) => {
         taskArgsStore.compileAll = true
         await run(TASK_COMPILE, { quiet: true })
+    });
+
+
+task(TASK_COVERAGE, 'Instrument sol files, compile')
+    .addOptionalParam('contracts', 'Optionally the contracts folder', './contracts/')
+    .addOptionalParam('out', 'Optionally the output folder', './coverage/contracts/')
+    .addOptionalParam('report', 'Optionally the output folder', './coverage/report/')
+    .addOptionalParam('test', 'Test command (should be the npx compatible command)')
+    .setAction(async (cliArgs: {
+        contracts?: string
+        out?: string
+        report?: string
+    }, { run }) => {
+
+        await run(TASK_CLEAN, { quiet: true });
+        const source = cliArgs.contracts || './contracts/';
+        const target = cliArgs.out || './coverage/contracts/';
+        await $coverage.instrumentFiles({
+            source,
+            target,
+        });
+        await $coverage.compile({ contracts: target });
+        await $command.utest();
+        await $coverage.report();
     });
 
 task(TASK_CLEAN, 'Clears the cache and deletes all artifacts')
@@ -277,3 +304,5 @@ namespace ConfigHelper {
         Object.assign(paths, $backup);
     }
 }
+
+export const coverage = $coverage;
