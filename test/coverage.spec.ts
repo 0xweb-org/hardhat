@@ -20,7 +20,6 @@ UTest({
             source: 'test/fixtures/coverage/',
             ignore: []
         });
-        return;
 
         let [ fooInfo ] = await $coverage.compile({
             contracts: './coverage/contracts/'
