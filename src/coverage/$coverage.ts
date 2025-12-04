@@ -21,15 +21,19 @@ export namespace $coverage {
 
     export async function compile(params: {
         // e.g. ./coverage/contracts
-        contracts: string
+        contracts: string,
     }) {
         const hh = new HardhatProvider();
 
         // Ensure optimizer is disabled, otherwise instrumented code will be removed as unused.
-        // const hardhat = await hh.getHardhat();
-        // hardhat.config.solidity.compilers.forEach(compiler => {
-        //     compiler.settings.optimizer.enabled = false;
-        // });
+        const hardhat = await hh.getHardhat();
+        hardhat.config.solidity.compilers.forEach(compiler => {
+            // -compiler.settings.optimizer.enabled = false;
+            if (compiler.settings?.optimizer?.enabled) {
+                // Prevent from deep reorder
+                compiler.settings.optimizer.runs = 1;
+            }
+        });
 
         const client = await hh.client('hardhat');
         const result = await hh.compileSolDirectory(params.contracts, {
@@ -56,6 +60,7 @@ export namespace $coverage {
     export async function instrumentFiles(params: {
         source: string
         target?: string
+        ignore?: (string | RegExp)[]
     }) {
         let source = params.source;
         let targetDir = params.target ?? './coverage/contracts/';
@@ -88,8 +93,19 @@ export namespace $coverage {
             })
             .toArrayAsync({ threads: 5 });
 
+
+        const G_ORIG = 'orig';
+        const G_INSTRUMENT = 'instrument';
+
+        let groups = alot(targets).groupBy(x => {
+            if (isIgnored(x.relativePath, params.ignore)) {
+                return G_ORIG
+            }
+            return G_INSTRUMENT;
+        }).toDictionary(x => x.key, x => x.values);
+
         const api = await ApiUtil.getApi();
-        const result = await api.instrument(targets) as {
+        const result = await api.instrument(groups[G_INSTRUMENT]) as {
             canonicalPath: string
             relativePath: string
             source: string
@@ -97,13 +113,38 @@ export namespace $coverage {
 
         await alot(result)
             .forEachAsync(async target => {
-
                 let path = target.relativePath.replace(/^[\/.]*contracts/, '');
                 let output = $path.join(targetDir, path);
-
                 await File.writeAsync(output, target.source);
             })
-            .toArrayAsync({ threads: 5 })
+            .toArrayAsync({ threads: 5 });
+
+        await alot(groups[G_ORIG])
+            .forEachAsync(async target => {
+                let path = target.relativePath.replace(/^[\/.]*contracts/, '');
+                let output = $path.join(targetDir, path);
+                await File.writeAsync(output, target.source);
+            })
+            .toArrayAsync({ threads: 5 });
+
+
+        function isIgnored (relativePath: string, ignores: (string | RegExp)[]) {
+            if (ignores == null || ignores.length === 0) {
+                return false;
+            }
+            for (let ignore of ignores) {
+                if (typeof ignore === 'string') {
+                    if (relativePath.includes(ignore)) {
+                        return true;
+                    }
+                } else if (ignore instanceof RegExp) {
+                    if (ignore.test(relativePath)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
     }
 
 
