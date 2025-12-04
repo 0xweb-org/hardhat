@@ -111,7 +111,7 @@ export namespace $coverage {
             source: string
         }[];
 
-        await alot(result)
+        await alot(result ?? [])
             .forEachAsync(async target => {
                 let path = target.relativePath.replace(/^[\/.]*contracts/, '');
                 let output = $path.join(targetDir, path);
@@ -119,7 +119,7 @@ export namespace $coverage {
             })
             .toArrayAsync({ threads: 5 });
 
-        await alot(groups[G_ORIG])
+        await alot(groups[G_ORIG] ?? [])
             .forEachAsync(async target => {
                 let path = target.relativePath.replace(/^[\/.]*contracts/, '');
                 let output = $path.join(targetDir, path);
