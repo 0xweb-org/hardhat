@@ -10,17 +10,27 @@ import { HARDHAT_NETWORK_RESET_EVENT } from "hardhat/internal/constants";
 
 export namespace $coverage {
 
+    let viaIR = true;
+
+    export function config (opts: {
+        viaIR?: boolean
+    }) {
+        viaIR = opts.viaIR ?? viaIR;
+    }
+
+
     export async function compile(params: {
         // e.g. ./coverage/contracts
         contracts: string
     }) {
         const hh = new HardhatProvider();
-        const hardhat = await hh.getHardhat();
 
         // Ensure optimizer is disabled, otherwise instrumented code will be removed as unused.
-        hardhat.config.solidity.compilers.forEach(compiler => {
-            compiler.settings.optimizer.enabled = false;
-        });
+        // const hardhat = await hh.getHardhat();
+        // hardhat.config.solidity.compilers.forEach(compiler => {
+        //     compiler.settings.optimizer.enabled = false;
+        // });
+
         const client = await hh.client('hardhat');
         const result = await hh.compileSolDirectory(params.contracts, {
             tsgen: true
@@ -109,7 +119,7 @@ export namespace $coverage {
     class ApiUtil {
         @memd.deco.memoize()
         static async getApi() {
-            return new Api();
+            return new Api({ viaIR });
         }
     }
 }
