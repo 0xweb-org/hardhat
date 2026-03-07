@@ -43,7 +43,10 @@ export namespace $coverage {
         return result;
     }
 
-    export async function attachToHardhatVM(client: HardhatWeb3Client) {
+    export async function attachToHardhatVM(client?: HardhatWeb3Client) {
+        const hh = new HardhatProvider();
+        client ??= await hh.client('hardhat');
+
         const provider = await client.options.web3;
         const api = await ApiUtil.getApi();
 

@@ -24,6 +24,7 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
     .addOptionalParam('package', 'Compile the contracts within a specific mono-repo package. Artifacts and 0xc classes will be placed in the package directory')
     .addOptionalParam('tsgen', 'Skip the TypeScript class generation', true, types.boolean)
     .addOptionalParam('install', 'CSV sol path to install, default installs all compiled contracts from sources')
+    .addOptionalParam('contractNameMatchMode', '"strict" - default: contractName === fileName | "anyInFile" all contracts in the file')
     .addFlag('watch', 'Watch sources directory and reruns compilation task on changes')
 
     .setAction(async (
@@ -219,6 +220,8 @@ async function getCompiledAbis(config: {
     '0xweb'?: {
         // SOL files or contract names as CSV
         install?: string
+
+        contractNameMatchMode?: 'strict' | 'anyInFile'
     }
 }, compileSolOutput: {
     artifactsEmittedPerJob: {
@@ -233,6 +236,7 @@ async function getCompiledAbis(config: {
 }): Promise<{ name: string, path: string }[]> {
     const sources = config.paths.sources;
     const installs = config['0xweb']?.install?.split(',').map(x => x.trim()) ?? null;
+    const anyContractInFile = config['0xweb']?.contractNameMatchMode === 'anyInFile';
 
     const emittedArtifacts = alot(compileSolOutput.artifactsEmittedPerJob).mapMany((a) => {
         return alot(a.artifactsEmittedPerFile).mapMany((artifactPerFile) => {
@@ -254,7 +258,9 @@ async function getCompiledAbis(config: {
                     return shouldInstall;
                 }
                 if (sources != null) {
-                    return $path.normalize(x.sourceFile).toLowerCase().startsWith(`file://${$path.normalize(sources).toLowerCase()}`);
+                    return $path.normalize(x.sourceFile)
+                        .toLowerCase()
+                        .startsWith(`file://${$path.normalize(sources).toLowerCase()}`);
                 }
                 return false;
             })
@@ -269,18 +275,31 @@ async function getCompiledAbis(config: {
     let arr = files
         .map(file => {
             let path = file.uri.toString();
+            let name: string = null;
 
-            let match = /(?<sourceFileName>[^\\\/]+)\.sol[\\\/]/.exec(path);
-            if (match == null) {
+            let sourceFileNameMatch = /(?<name>[^\\\/]+)\.sol[\\\/]/.exec(path);
+            if (sourceFileNameMatch == null) {
                 return null;
             }
-            // assume artifactName === sourceFileName @TODO consider to handle different file-contract names
-            let name = match.groups.sourceFileName;
-            if (compileAll !== true && name in namesHash === false) {
-                return null;
+            if (anyContractInFile === true) {
+                let contractNameMatch = /[\/\\](?<name>[^\.]+)\.json$/.exec(path);
+                if (contractNameMatch == null) {
+                    return null;
+                }
+                name = contractNameMatch.groups.name;
+            } else {
+                // assume artifactName === sourceFileName
+                name = sourceFileNameMatch.groups.name;
+                if (compileAll !== true && name in namesHash === false) {
+                    return null;
+                }
+                if (new RegExp(`[\\\/]${name}\\.json$`).test(path) === false) {
+                    return null;
+                }
             }
-            if (new RegExp(`[\\\/]${name}\\.json$`).test(path) === false) {
-                return null;
+
+            if (name == null) {
+                throw new Error(`Unable to determine contract name for file ${path}`);
             }
 
             return {
