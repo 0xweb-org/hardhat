@@ -24,7 +24,7 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
     .addOptionalParam('package', 'Compile the contracts within a specific mono-repo package. Artifacts and 0xc classes will be placed in the package directory')
     .addOptionalParam('tsgen', 'Skip the TypeScript class generation', true, types.boolean)
     .addOptionalParam('install', 'CSV sol path to install, default installs all compiled contracts from sources')
-    .addOptionalParam('contractNameMatchMode', '"strict" - default: contractName === fileName | "anyInFile" all contracts in the file')
+    //-.addOptionalParam('contractNameMatchMode', '"strict" - default: contractName === fileName | "anyInFile" all contracts in the file')
     .addFlag('watch', 'Watch sources directory and reruns compilation task on changes')
 
     .setAction(async (
@@ -36,6 +36,7 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
             tsgen?: boolean
             install?: string
             package?: string
+            contractNameMatchMode?: string
         },
         { run, config, artifacts },
         runSuper
@@ -49,6 +50,9 @@ task(TASK_COMPILE, 'Compiles the entire project, building all artifacts')
         if (compilationArgs.install != null) {
             config['0xweb'].install = compilationArgs.install;
         }
+        //- if (compilationArgs.contractNameMatchMode != null) {
+        //-     config['0xweb'].contractNameMatchMode = compilationArgs.contractNameMatchMode;
+        //- }
         if (compilationArgs.package != null) {
             config['0xweb'].package = compilationArgs.package;
 
@@ -236,7 +240,7 @@ async function getCompiledAbis(config: {
 }): Promise<{ name: string, path: string }[]> {
     const sources = config.paths.sources;
     const installs = config['0xweb']?.install?.split(',').map(x => x.trim()) ?? null;
-    const anyContractInFile = config['0xweb']?.contractNameMatchMode === 'anyInFile';
+    //-const anyContractInFile = config['0xweb']?.contractNameMatchMode === 'anyInFile';
 
     const emittedArtifacts = alot(compileSolOutput.artifactsEmittedPerJob).mapMany((a) => {
         return alot(a.artifactsEmittedPerFile).mapMany((artifactPerFile) => {
@@ -275,35 +279,32 @@ async function getCompiledAbis(config: {
     let arr = files
         .map(file => {
             let path = file.uri.toString();
-            let name: string = null;
-
-            let sourceFileNameMatch = /(?<name>[^\\\/]+)\.sol[\\\/]/.exec(path);
-            if (sourceFileNameMatch == null) {
+            let match = /(?<fileName>[^\\\/]+)\.sol[\\\/](?<contractName>[^\.]+)\.json$/.exec(path);
+            if (match == null) {
                 return null;
             }
-            if (anyContractInFile === true) {
-                let contractNameMatch = /[\/\\](?<name>[^\.]+)\.json$/.exec(path);
-                if (contractNameMatch == null) {
-                    return null;
-                }
-                name = contractNameMatch.groups.name;
-            } else {
-                // assume artifactName === sourceFileName
-                name = sourceFileNameMatch.groups.name;
-                if (compileAll !== true && name in namesHash === false) {
-                    return null;
-                }
-                if (new RegExp(`[\\\/]${name}\\.json$`).test(path) === false) {
-                    return null;
-                }
+
+            let { fileName, contractName } = match.groups;
+            if (compileAll !== true && contractName in namesHash === false) {
+                // Not all and no new hardhat compilation
+                return null;
             }
 
-            if (name == null) {
-                throw new Error(`Unable to determine contract name for file ${path}`);
-            }
+            // if (anyContractInFile === true) {
+            //     let contractNameMatch = /[\/\\](?<name>[^\.]+)\.json$/.exec(path);
+            //     if (contractNameMatch == null) {
+            //         return null;
+            //     }
+            //     name = contractNameMatch.groups.name;
+            // } else {
+            //     // assume artifactName === sourceFileName
+            //     if (new RegExp(`[\\\/]${name}\\.json$`).test(path) === false) {
+            //         return null;
+            //     }
+            // }
 
             return {
-                name: name,
+                name: contractName,
                 path: path
             };
         })
