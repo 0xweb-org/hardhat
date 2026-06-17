@@ -268,7 +268,6 @@ async function getCompiledAbis(config: {
                 }
                 return false;
             })
-            //.filter(x => x.sourceFile.includes('@openzeppelin') === false)
             .toArray();
         }).toArray();
     }).toArray();
